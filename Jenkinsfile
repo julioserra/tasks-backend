@@ -33,6 +33,15 @@ pipeline {
                     sh 'mvn test'
                 }
             }
-        }                     
+        }
+        stage ('Deploy Frontend') {
+            steps {
+                dir('frontend') {
+                    git credentialsId: 'LoginGitHub', url: 'https://github.com/julioserra/tasks-frontend'
+                    sh 'mvn clean package'
+                    deploy adapters: [tomcat9(credentialsId: 'LoginTomcat', path: '', url: 'http://107.21.97.130/')], contextPath: 'tasks', war: 'target/tasks.war'
+                }
+            }
+        }                             
     }
 }
