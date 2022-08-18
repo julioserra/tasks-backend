@@ -17,13 +17,13 @@ pipeline {
             }
             steps {
                 withSonarQubeEnv('SONAR_LOCAL') {
-                    sh "${scannerHome}/bin/sonar-scanner -e -Dsonar.projectKey=DeployBack -Dsonar.host.url=http://107.21.97.130:9000 -Dsonar.login=0de245f0a06d2d38400d92391e37618144e81655 -Dsonar.java.binaries=target -Dsonar.coverage.exclusions=**/.mvn/**,**/src/test/**,**/model/**,**application.java"
+                    sh "${scannerHome}/bin/sonar-scanner -e -Dsonar.projectKey=DeployBack -Dsonar.host.url=http://IP:9000 -Dsonar.login=TOKEN -Dsonar.java.binaries=target -Dsonar.coverage.exclusions=**/.mvn/**,**/src/test/**,**/model/**,**application.java"
                 }                
             }
         }
         stage ('Deploy Backend') {
             steps {
-                deploy adapters: [tomcat9(credentialsId: 'LoginTomcat', path: '', url: 'http://107.21.97.130/')], contextPath: 'tasks-backend', war: 'target/tasks-backend.war'
+                deploy adapters: [tomcat9(credentialsId: 'LoginTomcat', path: '', url: 'http://IP/')], contextPath: 'tasks-backend', war: 'target/tasks-backend.war'
             }
         } 
         stage ('API Test') {
@@ -39,7 +39,7 @@ pipeline {
                 dir('frontend') {
                     git credentialsId: 'LoginGitHub', url: 'https://github.com/julioserra/tasks-frontend'
                     sh 'mvn clean package'
-                    deploy adapters: [tomcat9(credentialsId: 'LoginTomcat', path: '', url: 'http://107.21.97.130/')], contextPath: 'tasks', war: 'target/tasks.war'
+                    deploy adapters: [tomcat9(credentialsId: 'LoginTomcat', path: '', url: 'http://IP/')], contextPath: 'tasks', war: 'target/tasks.war'
                 }
             }
         }                             
@@ -50,10 +50,10 @@ pipeline {
             archiveArtifacts artifacts: 'target/tasks-backend.war, frontend/target/tasks.war', onlyIfSuccessful: true
         }
         unsuccessful {
-            emailext attachLog: true, body: 'See the attached log below', subject: 'Build Falhou', to: 'j.serra@itagtecnologia.com.br'
+            emailext attachLog: true, body: 'See the attached log below', subject: 'Build Falhou', to: 'MEUEMAIL'
         }
         fixed {
-            emailext attachLog: true, body: 'See the attached log below', subject: 'Build está completo', to: 'j.serra@itagtecnologia.com.br'
+            emailext attachLog: true, body: 'See the attached log below', subject: 'Build está completo', to: 'MEUEMAIL'
         }
     }
 }
